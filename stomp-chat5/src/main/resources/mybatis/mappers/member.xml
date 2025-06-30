@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+      PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ko.or.kosa.dao.MemberDAO">
+
+	<update id="updateMemberLastLogin">
+		update member set 
+			last_login_time = now()
+		where email = #{email}  
+	</update>
+	
+	<select id="findByEmail" resultType="ko.or.kosa.entity.MemberVO">
+		select 
+			*
+		from member
+		where email = #{email} 
+	</select> 
+   
+   	<insert id="insert" >
+   		<selectKey order="AFTER" keyProperty="id" resultType="long">
+   			select LAST_INSERT_ID() id
+   		</selectKey>
+   		
+		insert into member (
+			email, pwd
+		) values (
+			#{email}, #{pwd}
+		) 
+	</insert>
+	
+	<update id="loginCountInc">
+		update member set 
+			loginCount = loginCount + 1
+			<choose>
+				<when test="loginCount > 2">
+					, accountLocked = 'Y'
+				</when>
+				<otherwise>
+					, accountLocked = 'N'
+				</otherwise>
+			</choose>
+		where email = #{email} 
+	</update> 
+
+	 
+	<update id="loginCountClear">
+		update member set 
+			 loginCount = 0 
+			,accountLocked = 'N'
+		where email = #{email} 
+	</update> 
+   
+</mapper>
