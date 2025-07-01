@@ -3,40 +3,57 @@
   xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:security="http://www.springframework.org/schema/security"
-  xsi:schemaLocation="http://www.springframework.org/schema/security 
-    http://www.springframework.org/schema/security/spring-security.xsd
-    http://www.springframework.org/schema/beans 
-    http://www.springframework.org/schema/beans/spring-beans.xsd">
-    
-    <bean id="authFailureHandler" class="ko.or.kosa.config.handler.AuthFailureHandler"/>
-    <bean id="userDeniedHandler" class="ko.or.kosa.config.handler.UserDeniedHandler"/>
-    <bean id="authSuccessHandler" class="ko.or.kosa.config.handler.AuthSuccessHandler"/>
-    <bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
-    <bean id="userDetailsService" class="ko.or.kosa.service.MemberService"/>
-      
-    <security:http>
-      <security:csrf disabled="true"/>
-      <security:intercept-url pattern="/" access="permitAll"/>
-      <security:intercept-url pattern="/loginForm.do" access="permitAll"/>
-      <security:intercept-url pattern="/login.do" access="permitAll"/>
-      <security:intercept-url pattern="/js/**" access="permitAll"/>
-      <security:intercept-url pattern="/css/**" access="permitAll"/>
-      <security:intercept-url pattern="/image/**" access="permitAll"/>
-      <security:intercept-url pattern="/resources/**" access="permitAll"/>
-      <security:form-login 
-        login-page="/loginForm.do"  
-        login-processing-url="/login.do"
-        authentication-success-handler-ref="authSuccessHandler"
-        authentication-failure-handler-ref="authFailureHandler"
-        />
-        <!-- authentication-success-forward-url,  authentication-success-handler-ref, default-target-url 속성 중 1개만 설정 가능함 -->
-        
-      <security:access-denied-handler ref="userDeniedHandler"/>     
-    </security:http>
-  
-    <security:authentication-manager>
-      <security:authentication-provider user-service-ref="userDetailsService">
-          <security:password-encoder ref="passwordEncoder"/>
-      </security:authentication-provider>
-    </security:authentication-manager>  
+  xsi:schemaLocation="
+    http://www.springframework.org/schema/beans
+    https://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/security
+    https://www.springframework.org/schema/security/spring-security.xsd">
+
+  <!-- Security 관련 Bean 등록 -->
+  <bean id="authFailureHandler" class="ko.or.kosa.config.handler.AuthFailureHandler"/>
+  <bean id="authSuccessHandler" class="ko.or.kosa.config.handler.AuthSuccessHandler"/>
+  <bean id="userDeniedHandler" class="ko.or.kosa.config.handler.UserDeniedHandler"/>
+  <bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+  <bean id="userDetailsService" class="ko.or.kosa.service.MemberService"/>
+
+  <!-- Spring Security 필터 및 인증 설정 -->
+  <security:http auto-config="true" use-expressions="true">
+    <!-- CSRF 비활성화 -->
+    <security:csrf disabled="true"/>
+
+    <!-- 정적 리소스 허용 -->
+    <security:intercept-url pattern="/resources/**" access="permitAll"/>
+    <security:intercept-url pattern="/js/**" access="permitAll"/>
+    <security:intercept-url pattern="/css/**" access="permitAll"/>
+    <security:intercept-url pattern="/image/**" access="permitAll"/>
+
+    <!-- 로그인 관련 URL 허용 -->
+    <security:intercept-url pattern="/loginForm.do" access="permitAll"/>
+    <security:intercept-url pattern="/login.do" access="permitAll"/>
+
+    <!-- 홈 페이지 허용 -->
+    <security:intercept-url pattern="/" access="permitAll"/>
+
+    <!-- 그 외 URL은 인증 필요 -->
+    <security:intercept-url pattern="/**" access="isAuthenticated()"/>
+
+    <!-- 로그인 폼 설정 -->
+    <security:form-login 
+      login-page="/loginForm.do"
+      login-processing-url="/login.do"
+      authentication-success-handler-ref="authSuccessHandler"
+      authentication-failure-handler-ref="authFailureHandler"
+    />
+
+    <!-- 인가 실패 시 핸들러 -->
+    <security:access-denied-handler ref="userDeniedHandler"/>
+  </security:http>
+
+  <!-- 인증 관리자 설정 -->
+  <security:authentication-manager>
+    <security:authentication-provider user-service-ref="userDetailsService">
+      <security:password-encoder ref="passwordEncoder"/>
+    </security:authentication-provider>
+  </security:authentication-manager>
+
 </beans>

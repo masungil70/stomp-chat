@@ -7,6 +7,7 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.ChannelInterceptorAdapter;
 import org.springframework.stereotype.Component;
 
@@ -38,7 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class StompHandler extends ChannelInterceptorAdapter {
+public class StompHandler implements ChannelInterceptor {
     // websocket을 통해 들어온 요청이 처리 되기전 실행된다.
 		@Autowired
 		private ChatRoomService chatRoomService;
@@ -50,6 +51,7 @@ public class StompHandler extends ChannelInterceptorAdapter {
         for (Entry<String, Object> entry : message.getHeaders().entrySet()) {
           log.info("preSend() header -> {}", entry); 
         }
+        
         if (StompCommand.CONNECT == accessor.getCommand()) { // websocket 연결요청
             String jwtToken = accessor.getFirstNativeHeader("token");
             log.info("preSend() CONNECT message = {}", message);
