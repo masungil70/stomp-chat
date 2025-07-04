@@ -3,6 +3,21 @@
       PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
+<!-- 
+CREATE TABLE `member` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `email` varchar(20) NOT NULL,
+  `pwd` varchar(50) DEFAULT NULL,
+  `oauth` varchar(20) DEFAULT NULL,
+  `roles` varchar(20) DEFAULT NULL,
+  `accountExpired` varchar(20) DEFAULT NULL,
+  `accountLocked` varchar(20) DEFAULT NULL,
+  `loginCount` int(11) DEFAULT NULL,
+  `lastLoginTime` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+ -->
 <mapper namespace="ko.or.kosa.dao.MemberDAO">
 
 	<update id="updateMemberLastLogin">

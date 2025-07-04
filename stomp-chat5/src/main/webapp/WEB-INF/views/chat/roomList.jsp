@@ -33,23 +33,22 @@
     </div>
     <script type="text/javascript">
     	//webSocket을 사용하여 알람을 받을 수 있게 객체를 생성하고 서버에 연결한다
-			const sock = new SockJS("<c:url value='/ws-stomp'/>");
-			const ws = Stomp.over(sock);
-			const token = localStorage.getItem("jwt_token");
-			console.log("jwt_token", token);
+        const sock = new SockJS("<c:url value='/ws-stomp'/>");
+        const ws = Stomp.over(sock);
+        const token = localStorage.getItem("jwt_token");
+        console.log("jwt_token", token);
 			
-			let subscription = null;
+        let subscription = null;
     
     	// pub/sub 이벤트 설정 
-      ws.connect({
-    	    token: token  // <---- 여기에 넣으면 서버의 StompHandler에서 읽을 수 있음
-    	  }, function(frame) {
-    	  //메시지 수신 이벤트 핸들러 등록
-				subscribe();
-    	  
-      }, error => {
-      	alert("error " + error);
-      });
+        ws.connect({
+            Authorization : "Bearer " + token  // <---- 여기에 넣으면 서버의 StompHandler에서 읽을 수 있음
+    	   }, function(frame) {
+    	   //메시지 수신 이벤트 핸들러 등록
+		  	   subscribe();
+		   }, error => {
+			   alert("error " + error);
+        });
 
     	$("#room_name").on("keydown", e => {
     		if (e.keyCode == 13) {

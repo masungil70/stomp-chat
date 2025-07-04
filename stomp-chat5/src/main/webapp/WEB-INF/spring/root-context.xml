@@ -13,9 +13,9 @@
   <!-- DataSource 설정 -->
   <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
       <property name="driverClassName" value="org.mariadb.jdbc.Driver" />
-      <property name="url" value="jdbc:mariadb://localhost:53306/board_study" />
-      <property name="username" value="root" />
-      <property name="password" value="70sungil" />
+      <property name="url" value="jdbc:mariadb://localhost:3306/kosa_db" />
+      <property name="username" value="kosa" />
+      <property name="password" value="1004" />
   </bean>
     
   <!-- SessionFactory에 dataSourde, Bean 객체의 별명 설정, xml 파일의 위치 설정  -->

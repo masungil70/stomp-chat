@@ -39,33 +39,31 @@
     </div>
     <script type="text/javascript">
  		  // websocket & stomp 초기화 
- 		  const url = "${pageContext.request.contextPath}/ws-stomp";
-			const sock = new SockJS(url);
-    	const ws = Stomp.over(sock);
-		  const roomId = localStorage.getItem('chat.roomId');
-		  const sender = localStorage.getItem('chat.sender');
-	    const token = localStorage.getItem("jwt_token");
+        const url = "${pageContext.request.contextPath}/ws-stomp";
+        const sock = new SockJS(url);
+        const ws = Stomp.over(sock);
+        const roomId = localStorage.getItem('chat.roomId');
+        const sender = localStorage.getItem('chat.sender');
+        const token = localStorage.getItem("jwt_token");
 		  
-		  let subscription = null;
+        let subscription = null;
 		  
-		  console.log("ws", ws);
-		  console.log("roomId", roomId);
-		  console.log("sender", sender);
-	    console.log("jwt_token", token);
+        console.log("ws", ws);
+        console.log("roomId", roomId);
+        console.log("sender", sender);
+        console.log("jwt_token", token);
 	    
     	// pub/sub 이벤트 설정 
-      ws.connect({
-          token: token  // <---- 여기에 넣으면 서버의 StompHandler에서 읽을 수 있음      
-        }, function(frame) {
-    	  //메시지 수신 이벤트 핸들러 등록
-				subscribe();
-    	  
-    	  //채팅방에 입장 메시지를 서버에 전송한다
-    	  //enterSendMessage();
-    	  
-      }, error => {
-      	alert("error " + error);
-      });
+        ws.connect({
+        	  Authorization : "Bearer " + token  // <---- 여기에 넣으면 서버의 StompHandler에서 읽을 수 있음
+            }, function(frame) {
+    	    //메시지 수신 이벤트 핸들러 등록
+                subscribe();
+	    	  //채팅방에 입장 메시지를 서버에 전송한다
+	    	  //enterSendMessage();
+            }, error => {
+      	       alert("error " + error);
+      	});
     	 
     	$("#message").on("keydown", e => {
     		if (e.keyCode == 13) {

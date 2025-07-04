@@ -17,7 +17,8 @@
   <bean id="userDetailsService" class="ko.or.kosa.service.MemberService"/>
 
   <!-- Spring Security 필터 및 인증 설정 -->
-  <security:http auto-config="true" use-expressions="true">
+  <!-- session 상태관리를 하지 않는 방법을 했음 다음에 jwt를 사용하여 구현할 때는 대비하여 작성함 -->
+  <security:http  create-session="stateless" auto-config="true" use-expressions="true">
     <!-- CSRF 비활성화 -->
     <security:csrf disabled="true"/>
 
@@ -33,6 +34,8 @@
 
     <!-- 홈 페이지 허용 -->
     <security:intercept-url pattern="/" access="permitAll"/>
+    <security:intercept-url pattern="/chat/**" access="permitAll"/>
+    <security:intercept-url pattern="/ws-stomp/**" access="permitAll"/>
 
     <!-- 그 외 URL은 인증 필요 -->
     <security:intercept-url pattern="/**" access="isAuthenticated()"/>

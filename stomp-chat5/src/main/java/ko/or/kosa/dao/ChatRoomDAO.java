@@ -6,21 +6,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.stereotype.Repository;
 
 import ko.or.kosa.entity.ChatRoom;
 
 @Repository
 public class ChatRoomDAO {
-	private final String subChatRoomPath = "/sub/chat/room/";
-  private Map<String, ChatRoom> chatRoomMap;
-
-  @PostConstruct
-  private void init() {
-      chatRoomMap = new LinkedHashMap<>();
-  }
+  private final String subChatRoomPath = "/sub/chat/room/";
+  private Map<String, ChatRoom> chatRoomMap = new LinkedHashMap<>();
 
   public List<ChatRoom> findAllRoom() {
     // 채팅방 이름 순으로 반환

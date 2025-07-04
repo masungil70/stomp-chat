@@ -7,6 +7,7 @@ import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
@@ -48,4 +49,10 @@ public class WebSockConfig implements WebSocketMessageBrokerConfigurer {
        messageConverters.add(converter);
        return false;  // 기본 컨버터들도 함께 등록됨
    }
+	 
+//	 
+//	 public static void main(String [] args) {
+//		 BCryptPasswordEncoder en = new BCryptPasswordEncoder();
+//		 System.out.println(en.encode(null));
+//	 }
 }

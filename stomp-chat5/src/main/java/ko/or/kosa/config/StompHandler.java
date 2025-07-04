@@ -1,16 +1,25 @@
 package ko.or.kosa.config;
 
+import java.io.UnsupportedEncodingException;
+import java.security.Principal;
+import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.crypto.SecretKey;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.messaging.support.ChannelInterceptorAdapter;
 import org.springframework.stereotype.Component;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.WeakKeyException;
 import ko.or.kosa.service.ChatRoomService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,6 +52,7 @@ public class StompHandler implements ChannelInterceptor {
     // websocket을 통해 들어온 요청이 처리 되기전 실행된다.
 		@Autowired
 		private ChatRoomService chatRoomService;
+		private String signingKey = "a29zYWR1em9uNWVycHpvbmVfc2VjdXJlX2tleV8hIyUm";
 	
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -53,11 +63,52 @@ public class StompHandler implements ChannelInterceptor {
         }
         
         if (StompCommand.CONNECT == accessor.getCommand()) { // websocket 연결요청
-            String jwtToken = accessor.getFirstNativeHeader("token");
+            String jwtToken = accessor.getFirstNativeHeader("Authorization");
+            String token = jwtToken.substring(7);
             log.info("preSend() CONNECT message = {}", message);
             log.info("preSend() CONNECT channel = {}", channel);
             log.info("preSend() CONNECT accessor = {}", accessor);
             log.info("preSend() CONNECT jwtToken = {}", jwtToken);
+            
+    		SecretKey key = null;
+			try {
+				key = Keys.hmacShaKeyFor(signingKey.getBytes("UTF-8"));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+    		// claim 정보 출력 (디버깅용)
+    		Long id = claims.get("id", Long.class);
+    		String username = claims.get("username", String.class);
+    		String email = claims.get("email", String.class);
+            log.debug("id = ", id);
+            log.debug("username = ", username);
+            log.debug("email = ", email);
+    		
+    		//Principal 객체를 생성하여 설정한다
+            //세션을 활성화 한 경우 아래 코드를 사용하여 인증 정보를 설정할 수 있음 
+    		accessor.setUser(new Principal() {
+				@Override
+				public String getName() {
+					return email;
+				}
+    		});
+    		
+    		
+            //만약 세션이 활성되지 않을 경우 simpSessionAttributes를 사용하여 처리함   
+    		var simpSessionAttributes = (Map<String, Object>) accessor.getHeader("simpSessionAttributes");;
+    		simpSessionAttributes.put("email", email);
+    		
+//          세션을 활성화 인증 정보를 설정하면 메시지를 새롭게 다시 구성해야 동작함 
+//    		return MessageBuilder
+//    				.withPayload(message.getPayload())
+//                    .copyHeaders(accessor.getMessageHeaders())
+//                    .build();
+            
         } else if (StompCommand.SUBSCRIBE == accessor.getCommand()) { // 채팅룸 구독요청
         	/*
         	 * 예]  header로 전달 되는 키와 값의 종류  
